@@ -6,6 +6,7 @@
     5- run "docker-compose up --build" then run "docker-compose up --d"
     6- run "docker-compose php composer install"
     7- run "docker-compose php php artisan migrate:fresh --seed"
+    8- run "docker-compose php php artisan jwt:secret"
     8- run "docker-compose php php artisan serve"
     9- import postman collection to test apis - attatched with project in "postman" folder or in mail attatchmebts
     10- add new environmint to 
