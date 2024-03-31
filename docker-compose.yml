@@ -1,80 +1,37 @@
-version: '3'
+version: '3.9'
 services:
 
+  #PHP service
   php:
     build:
-      args:
-        user: syam
-        uid: 1000
       context: .
-      dockerfile: ./docker/Dockerfile
-    volumes:
-      - ./:/var/www/
-      - $HOME/.composer/:$HOME/.composer/
+      target: php
+      args:
+        - APP_EVV=${APP_ENV}
     environment:
-      - "DB_HOST=mysql"
-      - "DB_DATABASE=tielearn"
-      - "DB_USERNAME=tielearn"
-      - "DB_PASSWORD=tielearn"
-      - "REDIS_HOST=redis"
-      - "REDIS_PORT=6379"
-    networks:
-      - service-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: web-server
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "8000:80"
+      - APP_EVV=${APP_ENV}
+      - CONTAINER_ROLE=app
+    working_dir: /var/www
     volumes:
       - ./:/var/www
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d/
-    networks:
-      - service-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+    tty: true
 
-  mysql:
-    image: mariadb:10.5.8
+  #database server
+  database:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    environment: 
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USERNAME=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     volumes:
-      - mysqldata:/var/lib/mysql
-    environment:
-      - "MYSQL_ROOT_PASSWORD=tielearn"
-      - "MYSQL_DATABASE=tielearn"
-      - "MYSQL_USER=tielearn"
-      - "MYSQL_PASSWORD=tielearn"
-    ports:
-        - "3306:3306"
-    networks:
-      - service-network
-
-  phpmyadmin:
-    image: phpmyadmin
-    restart: always
-    ports:
-      - 8001:80
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOST=mysql
-    networks:
-      - service-network
-  redis:
-    image: redis:4.0-alpine
-    command: redis-server --appendonly yes
-    ports:
-      - "6379:6379"
-    networks:
-      - service-network
-
-  composer:
-    image: composer:latest
-    container_name: composer
-    networks:
-        - service-network
+      - db-data:/var/lib/mysql
 
 volumes:
-  mysqldata:
-
-networks:
-  service-network:
-    driver: bridge
+  db-data: ~
