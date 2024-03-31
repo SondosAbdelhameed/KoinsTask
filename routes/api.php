@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IntervalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,5 +34,6 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('jwt')->group(function () {
-    Route::resource('products',ProductController::class);
+    Route::post('set-interval',[IntervalController::class,'setInterval']);
+    //Route::get('books',IntervalController::class);
 });
